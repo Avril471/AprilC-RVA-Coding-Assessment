@@ -1,0 +1,71 @@
+library(shiny)
+library(dplyr)
+library(ggplot2)
+
+# --- Data Prep (outside server for efficiency) ---
+adae_clean <- adae %>%
+  left_join(adsl %>% select(USUBJID), by = "USUBJID")
+
+# --- UI ---
+ui <- fluidPage(
+  titlePanel("Adverse Events by System Organ Class and Severity"),
+  
+  sidebarLayout(
+    sidebarPanel(
+      checkboxGroupInput(
+        inputId  = "actarm_filter",
+        label    = "Filter by Treatment Arm:",
+        choices  = sort(unique(adae_clean$ACTARM)),
+        selected = sort(unique(adae_clean$ACTARM))  # all selected by default
+      )
+    ),
+    
+    mainPanel(
+      plotOutput("ae_plot", height = "600px")
+    )
+  )
+)
+
+# --- Server ---
+server <- function(input, output) {
+  
+  # Reactive: filter by selected treatment arms
+  filtered_data <- reactive({
+    adae_clean %>%
+      filter(ACTARM %in% input$actarm_filter) %>%
+      distinct(USUBJID, AESOC, AESEV) %>%
+      count(AESOC, AESEV, name = "n")
+  })
+  
+  # Reactive: SOC ordering recalculates when filter changes
+  plot_data <- reactive({
+    soc_order <- filtered_data() %>%
+      group_by(AESOC) %>%
+      summarise(total = sum(n)) %>%
+      arrange(total) %>%
+      pull(AESOC)
+    
+    filtered_data() %>%
+      mutate(AESOC = factor(AESOC, levels = soc_order))
+  })
+  
+  
+  # Render plot
+  output$ae_plot <- renderPlot({
+    req(input$actarm_filter)  # guard: don't render if nothing selected
+    
+    ggplot(plot_data(), aes(x = n, y = AESOC, fill = AESEV)) +
+      geom_bar(stat = "identity") +
+      labs(
+        title = "Adverse Events by System Organ Class and Severity",
+        x     = "Count of Unique Subjects",
+        y     = "System Organ Class",
+        fill  = "Severity"
+      ) +
+      theme_bw() +
+      theme(legend.position = "bottom")
+  })
+}
+
+shinyApp(ui, server)
+  
