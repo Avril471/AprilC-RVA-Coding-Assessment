@@ -12,7 +12,7 @@ to get the full study denominator, then used `{gtsummary}` to build a regulatory
 summary table with SOC and Preferred Term rows across treatment arm columns.
 
 **Output:** HTML table
-🔗 [View rendered table](https://avril471.github.io/AprilC-RVA-Coding-Assessment/Q1/teae_table.html)
+🔗 [View Summary table](https://avril471.github.io/AprilC-RVA-Coding-Assessment/Q1/teae_table.html)
 
 ---
 
