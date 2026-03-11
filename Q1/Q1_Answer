@@ -1,1 +1,12 @@
+TEAE Summary Table
 
+The table summarizes treatment-emergent adverse events across three treatment arms 
+(Placebo, Xanomeline High Dose, Xanomeline Low Dose)
+
+Note:
+
+  Percentages are calculated against the total enrolled subjects from the study 
+  population, not just those who experienced an event, which is the correct 
+  approach for regulatory reporting.
+
+Live output: https://avril471.github.io/AprilC-RVA-Coding-Assessment/Q1/teae_table.html
