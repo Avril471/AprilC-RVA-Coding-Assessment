@@ -1,1 +1,9 @@
+AE Severity Visualization
 
+The chart visualizes unique subject counts per System Organ Class broken down by 
+severity level (MILD, MODERATE, SEVERE), ordered from least to most frequent SOC.
+
+Notes:
+Color/filled determined by intensity
+
+Output: Q2/ae_severity_plot.png
