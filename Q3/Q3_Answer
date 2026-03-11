@@ -1,1 +1,16 @@
+Interactive Shiny Application
 
+The dashboard allows users to filter the Q2 visualization by treatment arm 
+interactively. All three arms are selected by default, and the chart updates 
+dynamically as selections change — including recalculating the SOC ordering 
+to reflect only the currently visible data.
+
+Notes:
+- Data loading and preparation is done outside the server for efficiency, 
+  so heavy processing only happens once at app startup.
+- The severity colour scale (light to dark) and ordering (MILD → MODERATE → SEVERE) 
+  are consistent with Q2 for a cohesive presentation.
+- A guard is in place to prevent the chart from erroring when all treatment 
+  arms are deselected.
+
+Live app: https://choqyy-april-cheng.shinyapps.io/RVA-Q3-Shiny
