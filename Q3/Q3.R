@@ -26,10 +26,10 @@ ui <- fluidPage(
   )
 )
 
-# --- Server ---
+# --- Server 
 server <- function(input, output) {
   
-  # Reactive: filter by selected treatment arms
+  # Reactive: deduplicate and count after applying treatment arm filter
   filtered_data <- reactive({
     adae_clean %>%
       filter(ACTARM %in% input$actarm_filter) %>%
@@ -37,7 +37,7 @@ server <- function(input, output) {
       count(AESOC, AESEV, name = "n")
   })
   
-  # Reactive: SOC ordering recalculates when filter changes
+  # Reactive: recalculate SOC ordering based on current filtered data
   plot_data <- reactive({
     soc_order <- filtered_data() %>%
       group_by(AESOC) %>%
@@ -46,24 +46,33 @@ server <- function(input, output) {
       pull(AESOC)
     
     filtered_data() %>%
-      mutate(AESOC = factor(AESOC, levels = soc_order))
+      mutate(
+        AESOC = factor(AESOC, levels = soc_order),
+        AESEV = factor(AESEV, levels = c("MILD", "MODERATE", "SEVERE"))
+      )
   })
   
-  
-  # Render plot
+  # Render plot — req() prevents rendering when no arms are selected
   output$ae_plot <- renderPlot({
-    req(input$actarm_filter)  # guard: don't render if nothing selected
+    req(input$actarm_filter)
     
     ggplot(plot_data(), aes(x = n, y = AESOC, fill = AESEV)) +
       geom_bar(stat = "identity") +
+      scale_fill_manual(
+        values = c(
+          "MILD"     = "#fdd9b5",
+          "MODERATE" = "#f4845f",
+          "SEVERE"   = "#c0392b"
+        )
+      ) +
       labs(
-        title = "Adverse Events by System Organ Class and Severity",
-        x     = "Count of Unique Subjects",
+        title = "Unique Subjects per SOC and Severity Level",
+        x     = "Number of Unique Subjects",
         y     = "System Organ Class",
         fill  = "Severity"
       ) +
       theme_bw() +
-      theme(legend.position = "bottom")
+      theme(legend.position = "right")
   })
 }
 
